@@ -70,16 +70,26 @@ class App(ctk.CTk):
     def change_image(self, button):
         image_name = button.cget("text")
         fullpath = self.images_folder_path + "/" + image_name
-        print(fullpath)
         self.image_canvas.delete(self.image_canvas_tagname)
         self.curr_image = MyImage(filepath=fullpath)
-        self.image_canvas.create_image(0,0,image = self.curr_image.image_tk, tags = self.image_canvas_tagname)
+        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image)
 
         
 
     def load_image(self, event):
+        canvas_ratio = event.width / event.height
+        # Check if Image Height of Width is Larger
+        if canvas_ratio > self.curr_image.image_ratio: # Canvas is wider
+            image_height = event.height
+            image_width = image_height * self.curr_image.image_ratio
+        else: # Canvas is Taller
+            image_width = event.width
+            image_height = image_width/self.curr_image.image_ratio
+
         self.image_canvas.delete(self.image_canvas_tagname)
-        self.image_canvas.create_image(0,0,image = self.curr_image.image_tk, tags = self.image_canvas_tagname)
+        resized_image = self.curr_image.image.resize((int(image_width), int(image_height)))
+        self.curr_image.image_tk = ImageTk.PhotoImage(image = resized_image)
+        self.image_canvas.create_image(event.width/2, event.height/2, image = self.curr_image.image_tk)
 
 App()
 
