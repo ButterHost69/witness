@@ -1,16 +1,31 @@
 import customtkinter as ctk
 from image_widgets import *
 import keyboard
-from PIL import ImageGrab
+from PIL import ImageGrab, Image, ImageTk
+import os
+from os.path import isfile
+
+class MyImage():
+    def __init__(self, filepath:str):
+        self.filepath = filepath
+        self.image = Image.open(self.filepath)
+        self.image_tk = ImageTk.PhotoImage(image=self.image)
+        self.image_width = self.image.size[0]
+        self.image_height = self.image.size[1]
+        self.image_ratio = self.image_width / self.image_height
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         ctk.set_appearance_mode('dark')
         self.geometry('800x500')
+        self.minsize(800,500)
         self.rowconfigure(index=0, weight=1)
         self.columnconfigure(index=0, weight=2, uniform='a')
         self.columnconfigure(index=1, weight=6, uniform='a')
+
+        self.image_canvas_tagname = "imagecanvas#1"
+        self.cropbox_tagname = "cropbox#1"
 
         self.select_folder_widget = SelectFolderWindow(parent = self, start_ss_server_func= self.start_ss_server)
         self.bind('<Escape>', lambda _ : self.quit())
@@ -35,8 +50,36 @@ class App(ctk.CTk):
         image_grab_instance.close()
         fileno += 1
     
+    def getallimages(self, path:str) -> list[str]:
+        image_list = []
+        for file in os.listdir(path + "/"):
+            fullpath = path + "/" + file 
+            if isfile(fullpath):
+                if file.split(".")[-1] == "png":
+                    image_list.append(fullpath)
+        return image_list
+
     def stop_record_keys(self):
         keyboard.remove_all_hotkeys()
+        self.screenshotserver_window.grid_forget()
+        images_fullpath = self.getallimages(self.images_folder_path)
+        self.curr_image = MyImage(filepath=images_fullpath[0])
+        self.menu_window = Menu(self, image_list=images_fullpath, change_image_func = self.change_image)
+        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image)
+    
+    def change_image(self, button):
+        image_name = button.cget("text")
+        fullpath = self.images_folder_path + "/" + image_name
+        print(fullpath)
+        self.image_canvas.delete(self.image_canvas_tagname)
+        self.curr_image = MyImage(filepath=fullpath)
+        self.image_canvas.create_image(0,0,image = self.curr_image.image_tk, tags = self.image_canvas_tagname)
+
+        
+
+    def load_image(self, event):
+        self.image_canvas.delete(self.image_canvas_tagname)
+        self.image_canvas.create_image(0,0,image = self.curr_image.image_tk, tags = self.image_canvas_tagname)
 
 App()
 

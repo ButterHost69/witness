@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from tkinter import filedialog, ttk
+from tkinter import filedialog, ttk, Canvas
 
 
 
@@ -46,3 +46,22 @@ class ScreenshotServerWindow(ctk.CTkFrame):
             # self.record_button["background"] = "Blue"
             self.record_button["text"] = "Start..."
             self.stop_record_keys_func()
+
+
+class ImageCanvas(Canvas):
+    def __init__(self, parent, load_image_func):
+        super().__init__(master = parent, background='#242424', bd=0, highlightthickness = 0, relief='ridge')
+        self.grid(row=0, column=1, sticky='nsew')
+        self.bind('<Configure>', load_image_func)
+
+
+class Menu(ctk.CTkFrame):
+    def __init__(self, parent, image_list, change_image_func):
+        super().__init__(master = parent)
+        self.grid(row = 0, column = 0, sticky = 'nsew')
+        for file in image_list:
+            image_name = file.split("/")[-1]
+            button = ctk.CTkButton(master = self, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
+            button.configure(command = lambda button = button: change_image_func(button))
+            button.pack()
+            
