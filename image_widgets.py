@@ -49,14 +49,17 @@ class ScreenshotServerWindow(ctk.CTkFrame):
 
 
 class ImageCanvas(Canvas):
-    def __init__(self, parent, load_image_func):
+    def __init__(self, parent, load_image_func, draw_cropbox_func, reset_draw_cropbox_func):
         super().__init__(master = parent, background='#242424', bd=0, highlightthickness = 0, relief='ridge')
         self.grid(row=0, column=1, sticky='nsew')
+        # self.bind('<Motion>',  lambda event: print(f'x1: {event.x} | y1: {event.y}'))
+        self.bind('<B1-Motion>', draw_cropbox_func)
+        self.bind('<ButtonRelease-1>', reset_draw_cropbox_func)
         self.bind('<Configure>', load_image_func)
 
 
 class Menu(ctk.CTkFrame):
-    def __init__(self, parent, image_list, change_image_func):
+    def __init__(self, parent, image_list, change_image_func, confirm_image_size_func):
         super().__init__(master = parent)
         self.grid(row = 0, column = 0, sticky = 'nsew')
         for file in image_list:
@@ -64,4 +67,6 @@ class Menu(ctk.CTkFrame):
             button = ctk.CTkButton(master = self, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
             button.configure(command = lambda button = button: change_image_func(button))
             button.pack()
+        confirm_ss_btn = ctk.CTkButton(master = self, text = "Confirm Crop", command= confirm_image_size_func)
+        confirm_ss_btn.pack()
             

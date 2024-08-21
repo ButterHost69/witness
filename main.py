@@ -26,6 +26,8 @@ class App(ctk.CTk):
 
         self.image_canvas_tagname = "imagecanvas#1"
         self.cropbox_tagname = "cropbox#1"
+        self.x1 = None
+        self.y1 = None
 
         self.select_folder_widget = SelectFolderWindow(parent = self, start_ss_server_func= self.start_ss_server)
         self.bind('<Escape>', lambda _ : self.quit())
@@ -61,25 +63,24 @@ class App(ctk.CTk):
 
     def stop_record_keys(self):
         keyboard.remove_all_hotkeys()
+        self.attributes("-alpha", 0.9)
         self.screenshotserver_window.grid_forget()
         images_fullpath = self.getallimages(self.images_folder_path)
         self.curr_image = MyImage(filepath=images_fullpath[0])
-        self.menu_window = Menu(self, image_list=images_fullpath, change_image_func = self.change_image)
-        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image)
+        self.menu_window = Menu(self, image_list=images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size)
+        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
     
     def change_image(self, button):
         image_name = button.cget("text")
         fullpath = self.images_folder_path + "/" + image_name
         self.image_canvas.delete(self.image_canvas_tagname)
         self.curr_image = MyImage(filepath=fullpath)
-        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image)
-
-        
+        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)        
 
     def load_image(self, event):
-        canvas_ratio = event.width / event.height
+        self.canvas_ratio = event.width / event.height
         # Check if Image Height of Width is Larger
-        if canvas_ratio > self.curr_image.image_ratio: # Canvas is wider
+        if self.canvas_ratio > self.curr_image.image_ratio: # Canvas is wider
             image_height = event.height
             image_width = image_height * self.curr_image.image_ratio
         else: # Canvas is Taller
@@ -90,6 +91,39 @@ class App(ctk.CTk):
         resized_image = self.curr_image.image.resize((int(image_width), int(image_height)))
         self.curr_image.image_tk = ImageTk.PhotoImage(image = resized_image)
         self.image_canvas.create_image(event.width/2, event.height/2, image = self.curr_image.image_tk)
+
+    def draw_cropbox(self, event):
+        if self.x1 is None and self.y1 is None:
+            self.x1, self.y1 = event.x, event.y
+        else:
+            self.image_canvas.delete(self.cropbox_tagname)
+        self.old_box = self.image_canvas.create_rectangle(self.x1, self.y1, event.x, event.y, tags=self.cropbox_tagname, )
+
+    def reset_draw_cropbox(self, event):
+        # self.x1 = None
+        # self.y1 = None
+        self.x2 = event.x
+        self.y2 = event.y   
+
+    def confirm_image_size(self):
+        # Resized Image Coordinates -> to -> Image Cordinates
+        resized__image_x, resized__image_y = self.curr_image.image_tk.width(), self.curr_image.image_tk.height()
+        real_image_x, real_image_y = self.curr_image.image_width, self.curr_image.image_height
+        rate_change_x = real_image_x/resized__image_x
+        rate_change_y = real_image_y/resized__image_y
+        changed_x1, changed_x2 = self.x1 * rate_change_x, self.x2 * rate_change_x
+        changed_y1, changed_y2 = self.y1 * rate_change_y - 130, self.y2 * rate_change_y - 130 # There is some offset in 'Y' I dont know Why ??
+        crop_image = self.curr_image.image.crop([changed_x1, changed_y1, changed_x2, changed_y2])
+        crop_image.save(self.curr_image.filepath)
+        self.image_canvas.delete('all')
+        self.curr_image = MyImage(self.curr_image.filepath)
+        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)        
+
+        self.x1 = None
+        self.y1 = None
+    
+
+
 
 App()
 
