@@ -28,6 +28,7 @@ class App(ctk.CTk):
         self.cropbox_tagname = "cropbox#1"
         self.x1 = None
         self.y1 = None
+        self.apply_to_all_checkbox = False
 
         self.select_folder_widget = SelectFolderWindow(parent = self, start_ss_server_func= self.start_ss_server)
         self.bind('<Escape>', lambda _ : self.quit())
@@ -65,9 +66,9 @@ class App(ctk.CTk):
         keyboard.remove_all_hotkeys()
         self.attributes("-alpha", 0.9)
         self.screenshotserver_window.grid_forget()
-        images_fullpath = self.getallimages(self.images_folder_path)
-        self.curr_image = MyImage(filepath=images_fullpath[0])
-        self.menu_window = Menu(self, image_list=images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size)
+        self.all_images_fullpath = self.getallimages(self.images_folder_path)
+        self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
+        self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all)
         self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
     
     def change_image(self, button):
@@ -113,14 +114,25 @@ class App(ctk.CTk):
         rate_change_y = real_image_y/resized__image_y
         changed_x1, changed_x2 = self.x1 * rate_change_x, self.x2 * rate_change_x
         changed_y1, changed_y2 = self.y1 * rate_change_y - 130, self.y2 * rate_change_y - 130 # There is some offset in 'Y' I dont know Why ??
-        crop_image = self.curr_image.image.crop([changed_x1, changed_y1, changed_x2, changed_y2])
-        crop_image.save(self.curr_image.filepath)
+        
+        if self.apply_to_all:
+            for img_path in self.all_images_fullpath:
+                image = MyImage(img_path)
+                crop_image = image.image.crop([changed_x1, changed_y1, changed_x2, changed_y2])
+                crop_image.save(img_path)
+
+        else:
+            crop_image = self.curr_image.image.crop([changed_x1, changed_y1, changed_x2, changed_y2])
+            crop_image.save(self.curr_image.filepath)
+        
         self.image_canvas.delete('all')
         self.curr_image = MyImage(self.curr_image.filepath)
         self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)        
-
         self.x1 = None
         self.y1 = None
+    
+    def apply_to_all(self):
+        self.apply_to_all_checkbox =  not self.apply_to_all_checkbox
     
 
 

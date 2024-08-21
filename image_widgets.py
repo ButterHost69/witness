@@ -59,7 +59,7 @@ class ImageCanvas(Canvas):
 
 
 class Menu(ctk.CTkFrame):
-    def __init__(self, parent, image_list, change_image_func, confirm_image_size_func):
+    def __init__(self, parent, image_list, change_image_func, confirm_image_size_func, apply_crop_to_all_func):
         super().__init__(master = parent)
         self.grid(row = 0, column = 0, sticky = 'nsew')
         for file in image_list:
@@ -69,4 +69,6 @@ class Menu(ctk.CTkFrame):
             button.pack()
         confirm_ss_btn = ctk.CTkButton(master = self, text = "Confirm Crop", command= confirm_image_size_func)
         confirm_ss_btn.pack()
+        apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Confirm Crop", command= apply_crop_to_all_func)
+        apply_to_all_btn.pack()
             
