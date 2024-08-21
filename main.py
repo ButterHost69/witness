@@ -4,6 +4,8 @@ import keyboard
 from PIL import ImageGrab, Image, ImageTk
 import os
 from os.path import isfile
+import io
+import win32clipboard
 
 class MyImage():
     def __init__(self, filepath:str):
@@ -43,7 +45,7 @@ class App(ctk.CTk):
     def record_keys(self):
         global fileno
         fileno = 0
-        keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot)
+        keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot, suppress=True)
     
     def take_screenshot(self):
         global fileno
@@ -68,7 +70,7 @@ class App(ctk.CTk):
         self.screenshotserver_window.grid_forget()
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
         self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
-        self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all)
+        self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all, load_all_images_to_clipboardserver_func = self.load_all_images_to_clipboard)
         self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
     
     def change_image(self, button):
@@ -135,7 +137,57 @@ class App(ctk.CTk):
         self.apply_to_all_checkbox =  not self.apply_to_all_checkbox
     
 
+    def load_all_images_to_clipboard(self):
+        self.image_canvas.grid_forget()
+        self.menu_window.grid_forget()
+        
+        self.clipboard_window = ClipboardWindow(parent = self)
+        self.minsize(0,0)
+        self.geometry("300x280")
+        self.attributes("-topmost", True)
+        keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_images, suppress=True)
 
+        self.preview_image_stack = []
+        for image_path in self.all_images_fullpath:
+            myimage = MyImage(image_path)
+            image_width = 300
+            image_height = image_width/myimage.image_ratio
+            resized_image = myimage.image.resize((int(image_width), int(image_height)))
+            myimage.image_tk = ImageTk.PhotoImage(image = resized_image)
+            self.preview_image_stack.append(myimage)
+
+        global preview_image_index
+        preview_image_index = 0
+        total_images = len(self.all_images_fullpath)
+        image_counter_str = f'{preview_image_index + 1}/{total_images}'
+        self.clipboard_window.image_label_content_str.set(image_counter_str)
+        self.load_image_to_clipboard(image = self.preview_image_stack[preview_image_index].image)
+        self.clipboard_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[0].image_tk)
+
+    def cycle_preview_images(self):
+        global preview_image_index
+        preview_image_index += 1
+        total_images = len(self.all_images_fullpath)
+        if preview_image_index == total_images:
+            preview_image_index = 0
+        
+        self.load_image_to_clipboard(image = self.preview_image_stack[preview_image_index].image)
+        self.clipboard_window.image_preview_canvas.delete('all')
+        self.clipboard_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
+        image_counter_str = f'{preview_image_index + 1}/{total_images}'
+        self.clipboard_window.image_label_content_str.set(image_counter_str)
+
+    def load_image_to_clipboard(self, image:Image):
+        output = io.BytesIO()
+        image.convert('RGB').save(output, 'BMP')
+        data = output.getvalue()[14:]
+        output.close()
+
+        # Copy the image to the clipboard
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+        win32clipboard.CloseClipboard()
 
 App()
 

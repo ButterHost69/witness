@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import filedialog, ttk, Canvas
+import tkinter as tk
 
 
 
@@ -59,7 +60,7 @@ class ImageCanvas(Canvas):
 
 
 class Menu(ctk.CTkFrame):
-    def __init__(self, parent, image_list, change_image_func, confirm_image_size_func, apply_crop_to_all_func):
+    def __init__(self, parent, image_list, change_image_func, confirm_image_size_func, apply_crop_to_all_func, load_all_images_to_clipboardserver_func):
         super().__init__(master = parent)
         self.grid(row = 0, column = 0, sticky = 'nsew')
         for file in image_list:
@@ -71,4 +72,25 @@ class Menu(ctk.CTkFrame):
         confirm_ss_btn.pack()
         apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Confirm Crop", command= apply_crop_to_all_func)
         apply_to_all_btn.pack()
+        load_images_to_clipboard_btn = ctk.CTkButton(master = self, text = "Load Images to Clipboard", command=load_all_images_to_clipboardserver_func)
+        load_images_to_clipboard_btn.pack()
             
+
+class ClipboardWindow(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master = parent)
+        self.grid(row = 0, columnspan = 2, column = 0, sticky = 'nsew')
+        
+        self.image_preview_canvas = Canvas(master = self, background='#242424', bd=0, highlightthickness = 0, relief='ridge')
+        self.image_preview_canvas.pack()
+
+        self.image_label_content_str = tk.StringVar()
+        self.image_label_content_str.set("current/no_of_images")
+        self.image_no_label = ctk.CTkLabel(master = self, textvariable = self.image_label_content_str)
+        self.image_no_label.pack()
+
+        self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
+        self.instruction_label.pack()
+
+        
+
