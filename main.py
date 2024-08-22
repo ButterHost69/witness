@@ -18,7 +18,7 @@ class MyImage():
 
 class App(ctk.CTk):
     def __init__(self):
-        super().__init__()
+        super().__init__(fg_color='#242424')
         ctk.set_appearance_mode('dark')
         self.geometry('800x500')
         self.minsize(800,500)
@@ -33,8 +33,9 @@ class App(ctk.CTk):
         self.apply_to_all_checkbox = False
 
         self.select_folder_widget = SelectFolderWindow(parent = self, start_ss_server_func= self.start_ss_server)
-        self.bind('<Escape>', lambda _ : self.quit())
+        # self.bind('<Escape>', lambda _ : self.quit())
         self.attributes('-alpha', 0.8)
+        # self.attributes('-alpha', 1)
         self.mainloop()
 
     def start_ss_server(self, path:str):
@@ -73,7 +74,11 @@ class App(ctk.CTk):
         self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all, load_all_images_to_clipboardserver_func = self.load_all_images_to_clipboard)
         self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
     
-    def change_image(self, button):
+    def change_image(self, button:ctk.CTkButton):
+        for cbutton in self.menu_window.image_buttons_list:
+            cbutton.configure(bg_color = 'transparent', fg_color='transparent')
+
+        button.configure(fg_color="blue")
         image_name = button.cget("text")
         fullpath = self.images_folder_path + "/" + image_name
         self.image_canvas.delete(self.image_canvas_tagname)

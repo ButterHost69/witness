@@ -6,11 +6,11 @@ import tkinter as tk
 
 class SelectFolderWindow(ctk.CTkFrame):
     def __init__(self, parent, start_ss_server_func):
-        super().__init__(master = parent)
+        super().__init__(master = parent, fg_color="#242424")
         self.start_ss_server_func = start_ss_server_func
         self.grid(row = 0, columnspan=2,column = 0 , stick = 'nsew')
 
-        expand_frame = ctk.CTkFrame(master = self)
+        expand_frame = ctk.CTkFrame(master = self, fg_color='#242424')
         label = ctk.CTkLabel(master = expand_frame, text = "Select Path to Store Screenshots")
         label.pack()
         select_folder_btn = ctk.CTkButton(master = expand_frame, text="Open Explorer", command=self.select_path)
@@ -24,28 +24,30 @@ class SelectFolderWindow(ctk.CTkFrame):
 
 class ScreenshotServerWindow(ctk.CTkFrame):
     def __init__(self, parent, record_keys_func, stop_record_keys_func):
-        super().__init__(master = parent)
+        super().__init__(master = parent, fg_color="#242424")
         self.record_keys_func = record_keys_func
         self.stop_record_keys_func = stop_record_keys_func
 
         self.grid(row = 0, columnspan = 2, column = 0, sticky = 'nsew')
-        expand_frame = ctk.CTkFrame(master = self)
+        expand_frame = ctk.CTkFrame(master = self, fg_color="#242424")
         expand_frame.pack(expand = True)
         instruction_label = ctk.CTkLabel(master = expand_frame, text = "Press <Ctrl-WinL+Alt+Space> To Take Screenshot !!")
         instruction_label.pack()
         
-        self.record_button = ttk.Button(master = expand_frame, text="Start...", command=self.start_server)
-        # self.record_button["background"] = "blue"
+        self.button_state = tk.StringVar()
+        self.button_state.set("Start...")
+        self.record_button = ctk.CTkButton(master = expand_frame, textvariable=self.button_state, command=self.start_server)
         self.record_button.pack()
 
     def start_server(self):
-        if self.record_button["text"] == "Start...":
-            # self.record_button["background"] = "Red"
-            self.record_button["text"] = "Stop !!"
+        if self.button_state.get() == "Start...":
+            self.button_state.set("Stop !!")
+            self.record_button.configure(fg_color="#b1101e")
+            self.record_button.configure(hover_color="red")
             self.record_keys_func()
         else:
-            # self.record_button["background"] = "Blue"
-            self.record_button["text"] = "Start..."
+            self.record_button.configure(fg_color="#144367")
+            self.button_state.set("Start...")
             self.stop_record_keys_func()
 
 
@@ -63,18 +65,23 @@ class Menu(ctk.CTkFrame):
     def __init__(self, parent, image_list, change_image_func, confirm_image_size_func, apply_crop_to_all_func, load_all_images_to_clipboardserver_func):
         super().__init__(master = parent)
         self.grid(row = 0, column = 0, sticky = 'nsew')
+        self.change_image_func = change_image_func
+        self.scrollabe_images_frame = ctk.CTkScrollableFrame(master = self)
+        self.image_buttons_list = []
         for file in image_list:
             image_name = file.split("/")[-1]
-            button = ctk.CTkButton(master = self, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
+            button = ctk.CTkButton(master = self.scrollabe_images_frame, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
             button.configure(command = lambda button = button: change_image_func(button))
             button.pack()
+            self.image_buttons_list.append(button)
+
+        self.scrollabe_images_frame.pack()
         confirm_ss_btn = ctk.CTkButton(master = self, text = "Confirm Crop", command= confirm_image_size_func)
         confirm_ss_btn.pack()
-        apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Confirm Crop", command= apply_crop_to_all_func)
+        apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Apply Crop to All", command= apply_crop_to_all_func)
         apply_to_all_btn.pack()
         load_images_to_clipboard_btn = ctk.CTkButton(master = self, text = "Load Images to Clipboard", command=load_all_images_to_clipboardserver_func)
         load_images_to_clipboard_btn.pack()
-            
 
 class ClipboardWindow(ctk.CTkFrame):
     def __init__(self, parent):
