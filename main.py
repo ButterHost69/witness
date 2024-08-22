@@ -93,6 +93,7 @@ class App(ctk.CTk):
         self.image_canvas.delete(self.image_canvas_tagname)
         resized_image = self.curr_image.image.resize((int(image_width), int(image_height)))
         self.curr_image.image_tk = ImageTk.PhotoImage(image = resized_image)
+        # print(f"Load Image: X: {self.curr_image.image_tk.width()} ; Y: {self.curr_image.image_tk.height()}")
         self.image_canvas.create_image(event.width/2, event.height/2, image = self.curr_image.image_tk)
 
     def draw_cropbox(self, event):
@@ -105,8 +106,14 @@ class App(ctk.CTk):
     def reset_draw_cropbox(self, event):
         # self.x1 = None
         # self.y1 = None
+        extra_yspace = (self.image_canvas.winfo_height() / 2) - (self.curr_image.image_tk.height() / 2)
+        extra_xspace = (self.image_canvas.winfo_width() / 2) - (self.curr_image.image_tk.width() / 2)
         self.x2 = event.x
-        self.y2 = event.y   
+        self.y2 = event.y 
+        self.newy1 = self.y1 - extra_yspace
+        self.newy2 = self.y2 - extra_yspace
+        self.newx1 = self.x1 - extra_xspace
+        self.newx2 = self.x2 - extra_xspace
 
     def confirm_image_size(self):
         # Resized Image Coordinates -> to -> Image Cordinates
@@ -114,15 +121,14 @@ class App(ctk.CTk):
         real_image_x, real_image_y = self.curr_image.image_width, self.curr_image.image_height
         rate_change_x = real_image_x/resized__image_x
         rate_change_y = real_image_y/resized__image_y
-        changed_x1, changed_x2 = self.x1 * rate_change_x, self.x2 * rate_change_x
-        changed_y1, changed_y2 = self.y1 * rate_change_y - 130, self.y2 * rate_change_y - 130 # There is some offset in 'Y' I dont know Why ??
-        
-        if self.apply_to_all:
+        changed_x1, changed_x2 = self.newx1 * rate_change_x, self.newx2 * rate_change_x
+        changed_y1, changed_y2 = self.newy1 * rate_change_y, self.newy2 * rate_change_y # There is some offset in 'Y' I dont know Why ??
+        # print(f"Confirm Image: X: {self.curr_image.image_tk.width()} ; Y: {self.curr_image.image_tk.height()}")
+        if self.apply_to_all_checkbox:
             for img_path in self.all_images_fullpath:
                 image = MyImage(img_path)
                 crop_image = image.image.crop([changed_x1, changed_y1, changed_x2, changed_y2])
                 crop_image.save(img_path)
-
         else:
             crop_image = self.curr_image.image.crop([changed_x1, changed_y1, changed_x2, changed_y2])
             crop_image.save(self.curr_image.filepath)
@@ -162,6 +168,8 @@ class App(ctk.CTk):
         image_counter_str = f'{preview_image_index + 1}/{total_images}'
         self.clipboard_window.image_label_content_str.set(image_counter_str)
         self.load_image_to_clipboard(image = self.preview_image_stack[preview_image_index].image)
+        clipboardcanvas_height = self.clipboard_window.image_preview_canvas.winfo_height()
+        clipboardcanvas_width = self.clipboard_window.image_preview_canvas.winfo_width()
         self.clipboard_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[0].image_tk)
 
     def cycle_preview_images(self):
