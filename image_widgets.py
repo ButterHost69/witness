@@ -33,17 +33,22 @@ class ScreenshotServerWindow(ctk.CTkFrame):
         expand_frame.pack(expand = True)
         instruction_label = ctk.CTkLabel(master = expand_frame, text = "Press <Ctrl-WinL+Alt+Space> To Take Screenshot !!")
         instruction_label.pack()
-        
+
         self.button_state = tk.StringVar()
         self.button_state.set("Start...")
         self.record_button = ctk.CTkButton(master = expand_frame, textvariable=self.button_state, command=self.start_server)
         self.record_button.pack()
+
+        self.image_taken_var = tk.StringVar()
+        self.images_taken_label = ctk.CTkLabel(master = expand_frame, textvariable = self.image_taken_var)
 
     def start_server(self):
         if self.button_state.get() == "Start...":
             self.button_state.set("Stop !!")
             self.record_button.configure(fg_color="#b1101e")
             self.record_button.configure(hover_color="red")
+            self.image_taken_var.set("Screenshots Taken: 0")
+            self.images_taken_label.pack()
             self.record_keys_func()
         else:
             self.record_button.configure(fg_color="#144367")

@@ -54,6 +54,7 @@ class App(ctk.CTk):
         image_grab_instance = ImageGrab.grab()
         image_grab_instance.save(filepath)
         image_grab_instance.close()
+        self.screenshotserver_window.image_taken_var.set(f"Screenshots Taken: {fileno + 1}")
         fileno += 1
     
     def getallimages(self, path:str) -> list[str]:
