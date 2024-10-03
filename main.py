@@ -46,7 +46,7 @@ class App(ctk.CTk):
     def record_keys(self):
         global fileno
         fileno = 0
-        keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot, suppress=True)
+        keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot)
     
     def take_screenshot(self):
         global fileno
@@ -63,8 +63,13 @@ class App(ctk.CTk):
             fullpath = path + "/" + file 
             if isfile(fullpath):
                 if file.split(".")[-1] == "png":
-                    image_list.append(fullpath)
-        return image_list
+                    image_list.append(file)
+
+        
+        images_sort_list = [int(image.split(".")[0]) for image in image_list]
+        images_sort_list.sort()
+        images_sort_list = [str(path + "/" + str(image) + ".png") for image in images_sort_list]
+        return images_sort_list
 
     def stop_record_keys(self):
         keyboard.remove_all_hotkeys()
@@ -157,7 +162,7 @@ class App(ctk.CTk):
         self.minsize(0,0)
         self.geometry("300x280")
         self.attributes("-topmost", True)
-        keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_images, suppress=True)
+        keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_images)
 
         self.preview_image_stack = []
         for image_path in self.all_images_fullpath:
