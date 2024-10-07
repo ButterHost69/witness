@@ -1,26 +1,69 @@
+import random
 import customtkinter as ctk
 from tkinter import filedialog, ttk, Canvas
 import tkinter as tk
-
+import os
+import shutil
 
 
 class SelectFolderWindow(ctk.CTkFrame):
-    def __init__(self, parent, start_ss_server_func):
+    def __init__(self, parent, start_ss_server_func, delete_ss_folder_later_func):
         super().__init__(master = parent, fg_color="#242424")
         self.start_ss_server_func = start_ss_server_func
+        self.delete_ss_folder_later_func = delete_ss_folder_later_func
+        # self.delete_ss_folder_later = delete_ss_folder_later
         self.grid(row = 0, columnspan=2,column = 0 , stick = 'nsew')
-
+        
         expand_frame = ctk.CTkFrame(master = self, fg_color='#242424')
         label = ctk.CTkLabel(master = expand_frame, text = "Select Path to Store Screenshots")
         label.pack()
         select_folder_btn = ctk.CTkButton(master = expand_frame, text="Open Explorer", command=self.select_path)
         select_folder_btn.pack()
+
+        continue_without_folder_btn = ctk.CTkButton(master = expand_frame, text="Continue Without Selecting Destination Folder", command=self.select_temp_path, )
+        continue_without_folder_btn.configure(fg_color="transparent")
+        continue_without_folder_btn.configure(border_width=2)
+        continue_without_folder_btn.configure(border_color="#ADD8E6")
+        continue_without_folder_btn.pack(pady=10)
+
         expand_frame.pack(expand = True)
-    
+
+    def select_temp_path(self):
+        self.delete_ss_folder_later_func(True)
+        path = os.path.abspath(r"temp")
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        os.makedirs(path)
+        self.start_ss_server_func(path)
+
     def select_path(self):
         path = filedialog.askdirectory()
         self.start_ss_server_func(path)
 
+
+class ScreenshotCounterWindow(ctk.CTkToplevel):
+    def __init__(self):
+        super().__init__(fg_color=self.generate_random_color())
+        # super().__init__(fg_color="#242424")
+        self.geometry("20x20+0+0")
+        self.overrideredirect(True)
+        self.attributes("-topmost", True)
+
+        self.counter_int = tk.IntVar()
+        self.counter_int.set(0)
+        self.counter = ctk.CTkLabel(master = self, textvariable = self.counter_int)
+        self.counter.pack()
+    
+    def generate_random_color(self):
+        # Generate a random RGB color
+        r = random.randint(0, 200)
+        g = random.randint(0, 200)
+        b = random.randint(0, 200)
+        return f'#{r:02x}{g:02x}{b:02x}'
+
+    def increament_counter(self):
+        self.counter_int.set(self.counter_int.get() + 1)
+        self.configure(fg_color = self.generate_random_color())
 
 class ScreenshotServerWindow(ctk.CTkFrame):
     def __init__(self, parent, record_keys_func, stop_record_keys_func):
@@ -77,16 +120,18 @@ class Menu(ctk.CTkFrame):
             image_name = file.split("/")[-1]
             button = ctk.CTkButton(master = self.scrollabe_images_frame, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
             button.configure(command = lambda button = button: change_image_func(button))
-            button.pack()
+            button.pack(pady=1)
             self.image_buttons_list.append(button)
 
         self.scrollabe_images_frame.pack()
         confirm_ss_btn = ctk.CTkButton(master = self, text = "Confirm Crop", command= confirm_image_size_func)
-        confirm_ss_btn.pack()
+        confirm_ss_btn.pack(pady=5)
+
         apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Apply Crop to All", command= apply_crop_to_all_func)
-        apply_to_all_btn.pack()
+        apply_to_all_btn.pack(pady = 10)
+        
         load_images_to_clipboard_btn = ctk.CTkButton(master = self, text = "Load Images to Clipboard", command=load_all_images_to_clipboardserver_func)
-        load_images_to_clipboard_btn.pack()
+        load_images_to_clipboard_btn.pack(pady = 30)
 
 class ClipboardWindow(ctk.CTkFrame):
     def __init__(self, parent):

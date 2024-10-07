@@ -6,6 +6,7 @@ import os
 from os.path import isfile
 import io
 import win32clipboard
+import shutil
 
 class MyImage():
     def __init__(self, filepath:str):
@@ -22,9 +23,8 @@ class App(ctk.CTk):
         ctk.set_appearance_mode('dark')
         self.geometry('800x500')
         self.minsize(800,500)
-        # self.iconbitmap(False, r"assets/logo.ico")
-        # icon = PhotoImage(file="assets/logo.png")
-        # self.wm_iconbitmap(True, icon)
+        
+        self.protocol("WM_DELETE_WINDOW", self.on_closing_window)
         self.title("Witness")
         self.rowconfigure(index=0, weight=1)
         self.columnconfigure(index=0, weight=2, uniform='a')
@@ -36,7 +36,11 @@ class App(ctk.CTk):
         self.y1 = None
         self.apply_to_all_checkbox = False
 
-        self.select_folder_widget = SelectFolderWindow(parent = self, start_ss_server_func= self.start_ss_server)
+        self.screenshot_counter_window = None
+
+        self.delete_ss_folder_later = False
+        self.select_folder_widget = SelectFolderWindow(parent = self, start_ss_server_func= self.start_ss_server, delete_ss_folder_later_func= self.update_delete_ss_folder_later)
+
         # self.bind('<Escape>', lambda _ : self.quit())
         self.attributes('-alpha', 0.8)
         # self.attributes('-alpha', 1)
@@ -45,6 +49,23 @@ class App(ctk.CTk):
         # icon = PhotoImage(file=png_path)
         self.wm_iconbitmap(bitmap=ico_path, default=ico_path)
         self.mainloop()
+
+    def on_closing_window(self):
+        if self.delete_ss_folder_later:
+            # print("LOG: Deleting Temp Dirr")
+            shutil.rmtree(self.images_folder_path)
+
+        if self.screenshot_counter_window != None:
+            self.screenshot_counter_window.destroy()
+            self.screenshot_counter_window = None
+
+        # print("LOG: Window is closing. Executing cleanup function.")
+        self.destroy() 
+        os._exit(0)
+
+    def update_delete_ss_folder_later(self, value: bool):
+        # print(f"log : Update Called: {value}")
+        self.delete_ss_folder_later = value
 
     def start_ss_server(self, path:str):
         self.images_folder_path = path
@@ -55,6 +76,8 @@ class App(ctk.CTk):
         global fileno
         fileno = 0
         keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot)
+        self.screenshot_counter_window = ScreenshotCounterWindow()
+        # print(f"LOG : Screen Shot Counter Set : {self.screenshot_counter_window}")
     
     def take_screenshot(self):
         global fileno
@@ -64,6 +87,7 @@ class App(ctk.CTk):
         image_grab_instance.close()
         self.screenshotserver_window.image_taken_var.set(f"Screenshots Taken: {fileno + 1}")
         fileno += 1
+        self.screenshot_counter_window.increament_counter()
     
     def getallimages(self, path:str) -> list[str]:
         image_list = []
@@ -83,6 +107,11 @@ class App(ctk.CTk):
         keyboard.remove_all_hotkeys()
         self.attributes("-alpha", 0.9)
         self.screenshotserver_window.grid_forget()
+        
+        if self.screenshot_counter_window != None:
+            self.screenshot_counter_window.destroy()
+            self.screenshot_counter_window = None
+
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
         self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
         self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all, load_all_images_to_clipboardserver_func = self.load_all_images_to_clipboard)
