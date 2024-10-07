@@ -22,6 +22,10 @@ class App(ctk.CTk):
         ctk.set_appearance_mode('dark')
         self.geometry('800x500')
         self.minsize(800,500)
+        # self.iconbitmap(False, r"assets/logo.ico")
+        # icon = PhotoImage(file="assets/logo.png")
+        # self.wm_iconbitmap(True, icon)
+        self.title("Witness")
         self.rowconfigure(index=0, weight=1)
         self.columnconfigure(index=0, weight=2, uniform='a')
         self.columnconfigure(index=1, weight=6, uniform='a')
@@ -36,6 +40,10 @@ class App(ctk.CTk):
         # self.bind('<Escape>', lambda _ : self.quit())
         self.attributes('-alpha', 0.8)
         # self.attributes('-alpha', 1)
+        png_path = os.path.abspath("32x32logo.png")
+        ico_path = os.path.abspath(r"assets/logo.ico")
+        # icon = PhotoImage(file=png_path)
+        self.wm_iconbitmap(bitmap=ico_path, default=ico_path)
         self.mainloop()
 
     def start_ss_server(self, path:str):

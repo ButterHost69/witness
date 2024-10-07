@@ -1,2 +1,5 @@
 testing-tkinter/
 testing-tk-2/
+out/build
+out/spec
+venv
