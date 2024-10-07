@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "WitnessInstaller", "WitnessInstaller\WitnessInstaller.vdproj", "{66EBCF8E-D068-4587-A922-E63547AB54BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66EBCF8E-D068-4587-A922-E63547AB54BF}.Debug|Default.ActiveCfg = Release
+		{66EBCF8E-D068-4587-A922-E63547AB54BF}.Debug|Default.Build.0 = Release
+		{66EBCF8E-D068-4587-A922-E63547AB54BF}.Release|Default.ActiveCfg = Release
+		{66EBCF8E-D068-4587-A922-E63547AB54BF}.Release|Default.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2735EA5A-489E-4DDF-8103-18A2BC1697C0}
+	EndGlobalSection
+EndGlobal
