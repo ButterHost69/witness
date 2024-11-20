@@ -30,7 +30,8 @@ class SelectFolderWindow(ctk.CTkFrame):
 
     def select_temp_path(self):
         self.delete_ss_folder_later_func(True)
-        path = os.path.abspath(r"temp")
+        # path = os.path.abspath(r"temp")
+        path = "C:\\Users\\palas\\Documents\\witness_temp\\"
         if os.path.exists(path):
             shutil.rmtree(path)
         os.makedirs(path)

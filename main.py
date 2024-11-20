@@ -8,6 +8,14 @@ import io
 import win32clipboard
 import shutil
 
+# Bugs:
+# [X] Have to Run EXE as Admin to create temp dir (Sol: Shit the temp fol to docs fol)
+# [ ] App freezeses and unable to close during and error (Sol: better error handl)
+
+# TODO: [ ] Discard a taken screenshot
+# TODO: [ ] Reorder Screenshots in the Editing Menu
+# TODO: [ ] Use a better color for crop border
+
 class MyImage():
     def __init__(self, filepath:str):
         self.filepath = filepath

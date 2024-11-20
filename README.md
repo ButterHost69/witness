@@ -9,7 +9,7 @@ Make the process of taking Screenshots seemless.
 
 Allows User to take Screenshots Without being interrupted, and Paste them together in Batch 
 
-## Features
+## Release Features
 
 - Take Screenshots Using Key-Bindings
 - Crop Images
@@ -17,6 +17,12 @@ Allows User to take Screenshots Without being interrupted, and Paste them togeth
 - Paste Screenshots In Series
 - Cycle all Screenshots onto Clipboard with using just Key-Bindings
 
+## Upcomming/Testing Features
+- [ ] Discard a taken screenshot
+- [ ] Reorder Screenshots in the Editing Menu
+
+# Bug Fixes
+- [x] Using/Creating a temp directory doesn't require admin privilages
 
 ## Demo
 
