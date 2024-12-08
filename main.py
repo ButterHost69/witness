@@ -84,8 +84,31 @@ class App(ctk.CTk):
         global fileno
         fileno = 0
         keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot)
+        keyboard.add_hotkey('ctrl+windows+z', self.open_ss_edit_window)
         self.screenshot_counter_window = ScreenshotCounterWindow()
         # print(f"LOG : Screen Shot Counter Set : {self.screenshot_counter_window}")
+    
+    # TODO: [ ] Unable to Load Separate Window, atm same start, stop window is overriden
+    def open_ss_edit_window(self):
+        self.all_images_fullpath = self.getallimages(self.images_folder_path)
+        self.mini_ss_edit_window = MiniSSEditWindow(parent= self)
+        keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_miniss_images)
+
+        self.preview_image_stack = []
+        for image_path in self.all_images_fullpath:
+            myimage = MyImage(image_path)
+            image_width = 300
+            image_height = image_width/myimage.image_ratio
+            resized_image = myimage.image.resize((int(image_width), int(image_height)))
+            myimage.image_tk = ImageTk.PhotoImage(image = resized_image)
+            self.preview_image_stack.append(myimage)
+
+        global preview_image_index
+        preview_image_index = 0
+        total_images = len(self.all_images_fullpath)
+        image_counter_str = f'{preview_image_index + 1}/{total_images}'
+        self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
+        self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[0].image_tk)
     
     def take_screenshot(self):
         global fileno
@@ -198,7 +221,6 @@ class App(ctk.CTk):
     def apply_to_all(self):
         self.apply_to_all_checkbox =  not self.apply_to_all_checkbox
     
-
     def load_all_images_to_clipboard(self):
         self.image_canvas.grid_forget()
         self.menu_window.grid_forget()
@@ -227,6 +249,19 @@ class App(ctk.CTk):
         clipboardcanvas_height = self.clipboard_window.image_preview_canvas.winfo_height()
         clipboardcanvas_width = self.clipboard_window.image_preview_canvas.winfo_width()
         self.clipboard_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[0].image_tk)
+
+    # TODO: [ ] Merge Both load image code for miniss and clipboard
+    def cycle_preview_miniss_images(self):
+        global preview_image_index
+        preview_image_index += 1
+        total_images = len(self.all_images_fullpath)
+        if preview_image_index == total_images:
+            preview_image_index = 0
+
+        self.mini_ss_edit_window.image_preview_canvas.delete('all')
+        self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
+        image_counter_str = f'{preview_image_index + 1}/{total_images}'
+        self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
 
     def cycle_preview_images(self):
         global preview_image_index

@@ -77,6 +77,8 @@ class ScreenshotServerWindow(ctk.CTkFrame):
         expand_frame.pack(expand = True)
         instruction_label = ctk.CTkLabel(master = expand_frame, text = "Press <Ctrl-WinL+Alt+Space> To Take Screenshot !!")
         instruction_label.pack()
+        miniss_label = ctk.CTkLabel(master = expand_frame, text = "Press <Ctrl-WinL+Z> To Open Mini SS Edit Window !!")
+        miniss_label.pack()
 
         self.button_state = tk.StringVar()
         self.button_state.set("Start...")
@@ -150,5 +152,27 @@ class ClipboardWindow(ctk.CTkFrame):
         self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
         self.instruction_label.pack()
 
+
+class MiniSSEditWindow(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master= parent)
+        # self.geometry("300x280")
+        # self.attributes("-topmost", True)
+        
+    
+        self.grid(row = 0, columnspan = 2, column = 0, sticky = 'nsew')
+        
+        self.image_preview_canvas = Canvas(master = self, background='#242424', bd=0, highlightthickness = 0, relief='ridge')
+        self.image_preview_canvas.pack()
+
+        self.image_label_content_str = tk.StringVar()
+        self.image_label_content_str.set("current/no_of_images")
+        self.image_no_label = ctk.CTkLabel(master = self, textvariable = self.image_label_content_str)
+        self.image_no_label.pack()
+
+        self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
+        self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+a>' To Remove Image")
+        self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
+        self.instruction_label.pack()
         
 
