@@ -16,6 +16,8 @@ import shutil
 # TODO: [ ] Reorder Screenshots in the Editing Menu
 # TODO: [ ] Use a better color for crop border
 
+# FIXME: [ ] When No Images blank screen appears, fix and display no image or something
+
 class MyImage():
     def __init__(self, filepath:str):
         self.filepath = filepath

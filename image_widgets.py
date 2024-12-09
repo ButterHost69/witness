@@ -153,14 +153,14 @@ class ClipboardWindow(ctk.CTkFrame):
         self.instruction_label.pack()
 
 
-class MiniSSEditWindow(ctk.CTkFrame):
+class MiniSSEditWindow(ctk.CTkToplevel):
     def __init__(self, parent):
-        super().__init__(master= parent)
-        # self.geometry("300x280")
-        # self.attributes("-topmost", True)
+        super().__init__()
+        self.geometry("300x280")
+        self.attributes("-topmost", True)
         
-    
-        self.grid(row = 0, columnspan = 2, column = 0, sticky = 'nsew')
+        # FIXME: [ ] Fix ME
+        # self.grid(row = 0, columnspan = 2, column = 0, sticky = 'nsew')
         
         self.image_preview_canvas = Canvas(master = self, background='#242424', bd=0, highlightthickness = 0, relief='ridge')
         self.image_preview_canvas.pack()
