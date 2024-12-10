@@ -16,6 +16,9 @@ import shutil
 # TODO: [ ] Reorder Screenshots in the Editing Menu
 # TODO: [ ] Use a better color for crop border
 
+#TODO: [ ] Continue Taking More Screenshots in SS Edit Window and be displayed
+#TODO: [ ] See a better way of loading Images/Something like lazy loading ?? Have a Global Place to store images, from where they can be accessed by others
+
 # FIXME: [ ] When No Images blank screen appears, fix and display no image or something
 
 class MyImage():
@@ -85,6 +88,7 @@ class App(ctk.CTk):
     def record_keys(self):
         global fileno
         fileno = 0
+        self.if_miniss_edit_window = False
         keyboard.add_hotkey('ctrl+windows+alt+space', self.take_screenshot)
         keyboard.add_hotkey('ctrl+windows+z', self.open_ss_edit_window)
         self.screenshot_counter_window = ScreenshotCounterWindow()
@@ -92,6 +96,14 @@ class App(ctk.CTk):
     
     # TODO: [ ] Unable to Load Separate Window, atm same start, stop window is overriden
     def open_ss_edit_window(self):
+        # If Window Already Opened, Close
+        if self.if_miniss_edit_window:
+            self.mini_ss_edit_window.destroy()
+            self.if_miniss_edit_window = False
+            return
+
+        # Or Open Window
+        self.if_miniss_edit_window = True
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
         self.mini_ss_edit_window = MiniSSEditWindow(parent= self)
         keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_miniss_images)

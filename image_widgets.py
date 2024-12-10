@@ -156,7 +156,7 @@ class ClipboardWindow(ctk.CTkFrame):
 class MiniSSEditWindow(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__()
-        self.geometry("300x280")
+        self.geometry("300x280+100+0")
         self.attributes("-topmost", True)
         
         # FIXME: [ ] Fix ME
