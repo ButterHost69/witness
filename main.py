@@ -100,13 +100,16 @@ class App(ctk.CTk):
         if self.if_miniss_edit_window:
             self.mini_ss_edit_window.destroy()
             self.if_miniss_edit_window = False
+            # keyboard.remove_hotkey('ctrl+windows+shift+>')
+            # keyboard.remove_hotkey('ctrl+windows+shift+D')
             return
 
         # Or Open Window
         self.if_miniss_edit_window = True
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
-        self.mini_ss_edit_window = MiniSSEditWindow(parent= self)
+        self.mini_ss_edit_window = MiniSSEditWindow()
         keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_miniss_images)
+        keyboard.add_hotkey('ctrl+windows+shift+:', self.delete_screenshot_confirm)
 
         self.preview_image_stack = []
         for image_path in self.all_images_fullpath:
@@ -124,6 +127,19 @@ class App(ctk.CTk):
         self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
         self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[0].image_tk)
     
+    def delete_screenshot_confirm(self):
+        keyboard.add_hotkey('enter', self.delete_screenshot_function)
+        keyboard.add_hotkey('escape', lambda: keyboard.remove_hotkey('enter'))
+        print("Confirm Delete Screenshot Button...")
+        self.mini_ss_edit_window.instruction_label_str.set("Press `enter` To Confirm Delete")
+    
+    # [ ] Change File Location Name to match sequence ??? maybe
+    def delete_screenshot_function(self):
+        print(self.all_images_fullpath[preview_image_index])
+        os.remove(self.all_images_fullpath[preview_image_index])
+        # pass
+        
+
     def take_screenshot(self):
         global fileno
         filepath = f"{self.images_folder_path}/{fileno}.png"
@@ -145,7 +161,8 @@ class App(ctk.CTk):
         
         images_sort_list = [int(image.split(".")[0]) for image in image_list]
         images_sort_list.sort()
-        images_sort_list = [str(path + "/" + str(image) + ".png") for image in images_sort_list]
+        # path = str(rf"{path}\{str(image)}.png")
+        images_sort_list = [str(path + r'\\' + str(image) + ".png") for image in images_sort_list]
         return images_sort_list
 
     def stop_record_keys(self):

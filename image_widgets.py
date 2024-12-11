@@ -154,7 +154,7 @@ class ClipboardWindow(ctk.CTkFrame):
 
 
 class MiniSSEditWindow(ctk.CTkToplevel):
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
         self.geometry("300x280+100+0")
         self.attributes("-topmost", True)
@@ -166,13 +166,20 @@ class MiniSSEditWindow(ctk.CTkToplevel):
         self.image_preview_canvas.pack()
 
         self.image_label_content_str = tk.StringVar()
+        
         self.image_label_content_str.set("current/no_of_images")
+        # self.instruction_label_str.set("Press <ctrl+windows+shift+:>' To Remove Image")
         self.image_no_label = ctk.CTkLabel(master = self, textvariable = self.image_label_content_str)
         self.image_no_label.pack()
 
+
+        self.instruction_label_str = tk.StringVar()
         self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
-        self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+a>' To Remove Image")
-        self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
+
+        self.instruction_label_str.set("Press <ctrl+windows+shift+:' To Remove Image")
+        self.delete_label = ctk.CTkLabel(master = self, textvariable = self.instruction_label_str)
+        # self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
         self.instruction_label.pack()
+        self.delete_label.pack()
         
 
