@@ -130,13 +130,25 @@ class App(ctk.CTk):
     def delete_screenshot_confirm(self):
         keyboard.add_hotkey('enter', self.delete_screenshot_function)
         keyboard.add_hotkey('escape', lambda: keyboard.remove_hotkey('enter'))
-        print("Confirm Delete Screenshot Button...")
+        # print("Confirm Delete Screenshot Button...")
         self.mini_ss_edit_window.instruction_label_str.set("Press `enter` To Confirm Delete")
-    
+
     # [ ] Change File Location Name to match sequence ??? maybe
+    # [ ] Esc Doesnt Work, display Esc as Presesed and delete menu is closed
+    # [ ] Check is Keybind there is not dont error use try Cath
+    # [ ] Next Image in SSEDIT MENU NOT working after deletion
     def delete_screenshot_function(self):
-        print(self.all_images_fullpath[preview_image_index])
+        global preview_image_index
+        # print(self.all_images_fullpath[preview_image_index])
         os.remove(self.all_images_fullpath[preview_image_index])
+        del self.all_images_fullpath[preview_image_index]
+        preview_image_index += 1
+
+        self.mini_ss_edit_window.image_preview_canvas.delete('all')
+        self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
+        image_counter_str = f'{preview_image_index}/{len(self.all_images_fullpath)}'
+        self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
+        # self.all_images_fullpath[preview_image_index]
         # pass
         
 
