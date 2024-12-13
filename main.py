@@ -127,14 +127,20 @@ class App(ctk.CTk):
         self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
         self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[0].image_tk)
     
+    def exit_delete_option(self):
+        try:
+            keyboard.remove_hotkey('enter')
+            self.mini_ss_edit_window.instruction_label_str.set("Press <ctrl+windows+shift+:' To Remove Image")    
+        except:
+            print("Already Escaped")
     def delete_screenshot_confirm(self):
         keyboard.add_hotkey('enter', self.delete_screenshot_function)
-        keyboard.add_hotkey('escape', lambda: keyboard.remove_hotkey('enter'))
+        keyboard.add_hotkey('escape', self.exit_delete_option)
         # print("Confirm Delete Screenshot Button...")
         self.mini_ss_edit_window.instruction_label_str.set("Press `enter` To Confirm Delete")
 
     # [ ] Change File Location Name to match sequence ??? maybe
-    # [ ] Esc Doesnt Work, display Esc as Presesed and delete menu is closed
+    # [X] Esc Doesnt Work, display Esc as Presesed and delete menu is closed
     # [ ] Check is Keybind there is not dont error use try Cath
     # [ ] Next Image in SSEDIT MENU NOT working after deletion
     def delete_screenshot_function(self):
