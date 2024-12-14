@@ -111,15 +111,8 @@ class App(ctk.CTk):
         keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_miniss_images)
         keyboard.add_hotkey('ctrl+windows+shift+:', self.delete_screenshot_confirm)
 
-        self.preview_image_stack = []
-        for image_path in self.all_images_fullpath:
-            myimage = MyImage(image_path)
-            image_width = 300
-            image_height = image_width/myimage.image_ratio
-            resized_image = myimage.image.resize((int(image_width), int(image_height)))
-            myimage.image_tk = ImageTk.PhotoImage(image = resized_image)
-            self.preview_image_stack.append(myimage)
-
+        self.update_preview_page_stack()
+        
         global preview_image_index
         preview_image_index = 0
         total_images = len(self.all_images_fullpath)
@@ -133,27 +126,45 @@ class App(ctk.CTk):
             self.mini_ss_edit_window.instruction_label_str.set("Press <ctrl+windows+shift+:' To Remove Image")    
         except:
             print("Already Escaped")
+
     def delete_screenshot_confirm(self):
         keyboard.add_hotkey('enter', self.delete_screenshot_function)
         keyboard.add_hotkey('escape', self.exit_delete_option)
         # print("Confirm Delete Screenshot Button...")
         self.mini_ss_edit_window.instruction_label_str.set("Press `enter` To Confirm Delete")
 
+    def update_preview_page_stack(self):
+        self.preview_image_stack = []
+        for image_path in self.all_images_fullpath:
+            myimage = MyImage(image_path)
+            image_width = 300
+            image_height = image_width/myimage.image_ratio
+            resized_image = myimage.image.resize((int(image_width), int(image_height)))
+            myimage.image_tk = ImageTk.PhotoImage(image = resized_image)
+            self.preview_image_stack.append(myimage)
+        
+
     # [ ] Change File Location Name to match sequence ??? maybe
     # [X] Esc Doesnt Work, display Esc as Presesed and delete menu is closed
     # [ ] Check is Keybind there is not dont error use try Cath
     # [ ] Next Image in SSEDIT MENU NOT working after deletion
+
+    # [ ] Deleted Image and Previewing Images is not the same
     def delete_screenshot_function(self):
         global preview_image_index
-        # print(self.all_images_fullpath[preview_image_index])
+        print(f"Preview Image Index: {preview_image_index}")
+        print(f"Image Deleting: {self.all_images_fullpath[preview_image_index]}")
+        
+        # Dont Change this --- This is correct
         os.remove(self.all_images_fullpath[preview_image_index])
         del self.all_images_fullpath[preview_image_index]
-        preview_image_index += 1
+        # preview_image_index = (preview_image_index + 1)%len(self.all_images_fullpath)
 
         self.mini_ss_edit_window.image_preview_canvas.delete('all')
         self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
         image_counter_str = f'{preview_image_index}/{len(self.all_images_fullpath)}'
         self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
+        self.exit_delete_option()
         # self.all_images_fullpath[preview_image_index]
         # pass
         
@@ -180,7 +191,8 @@ class App(ctk.CTk):
         images_sort_list = [int(image.split(".")[0]) for image in image_list]
         images_sort_list.sort()
         # path = str(rf"{path}\{str(image)}.png")
-        images_sort_list = [str(path + r'\\' + str(image) + ".png") for image in images_sort_list]
+        images_sort_list = [os.path.join(path, f"{image}.png") for image in images_sort_list]
+        # images_sort_list = [str(path + r"\\" + str(image) + ".png") for image in images_sort_list]
         return images_sort_list
 
     def stop_record_keys(self):
@@ -280,14 +292,7 @@ class App(ctk.CTk):
         self.attributes("-topmost", True)
         keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_images)
 
-        self.preview_image_stack = []
-        for image_path in self.all_images_fullpath:
-            myimage = MyImage(image_path)
-            image_width = 300
-            image_height = image_width/myimage.image_ratio
-            resized_image = myimage.image.resize((int(image_width), int(image_height)))
-            myimage.image_tk = ImageTk.PhotoImage(image = resized_image)
-            self.preview_image_stack.append(myimage)
+        self.update_preview_page_stack()
 
         global preview_image_index
         preview_image_index = 0
