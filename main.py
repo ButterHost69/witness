@@ -146,10 +146,12 @@ class App(ctk.CTk):
 
     # [ ] Change File Location Name to match sequence ??? maybe
     # [X] Esc Doesnt Work, display Esc as Presesed and delete menu is closed
-    # [ ] Check is Keybind there is not dont error use try Cath
+    # [X] Check is Keybind there is not dont error use try Cath
     # [ ] Next Image in SSEDIT MENU NOT working after deletion
+    # [ ] Index out of range error if deleting last ss
+    # [X] Path error in final Menu 
 
-    # [ ] Deleted Image and Previewing Images is not the same
+    # [X] Deleted Image and Previewing Images is not the same
     def delete_screenshot_function(self):
         global preview_image_index
         print(f"Preview Image Index: {preview_image_index}")
@@ -159,7 +161,8 @@ class App(ctk.CTk):
         os.remove(self.all_images_fullpath[preview_image_index])
         del self.all_images_fullpath[preview_image_index]
         # preview_image_index = (preview_image_index + 1)%len(self.all_images_fullpath)
-
+        self.update_preview_page_stack()
+    
         self.mini_ss_edit_window.image_preview_canvas.delete('all')
         self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
         image_counter_str = f'{preview_image_index}/{len(self.all_images_fullpath)}'
@@ -171,6 +174,7 @@ class App(ctk.CTk):
 
     def take_screenshot(self):
         global fileno
+        # filepath = f"{fileno}.png"
         filepath = f"{self.images_folder_path}/{fileno}.png"
         image_grab_instance = ImageGrab.grab()
         image_grab_instance.save(filepath)
@@ -191,7 +195,10 @@ class App(ctk.CTk):
         images_sort_list = [int(image.split(".")[0]) for image in image_list]
         images_sort_list.sort()
         # path = str(rf"{path}\{str(image)}.png")
-        images_sort_list = [os.path.join(path, f"{image}.png") for image in images_sort_list]
+        print("Pre-add",images_sort_list)
+        # images_sort_list = [os.path.join(path, f"{image}.png") for image in images_sort_list]
+        images_sort_list = [f"{path}/{image}.png" for image in images_sort_list]
+        print("Post-add", images_sort_list)
         # images_sort_list = [str(path + r"\\" + str(image) + ".png") for image in images_sort_list]
         return images_sort_list
 
@@ -206,6 +213,8 @@ class App(ctk.CTk):
 
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
         self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
+
+        self.update_preview_page_stack()
         self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all, load_all_images_to_clipboardserver_func = self.load_all_images_to_clipboard)
         self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
     
