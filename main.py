@@ -152,7 +152,8 @@ class App(ctk.CTk):
     # [X] If No image Display, No Image rather than crashing
     # [X] Path error in final Menu 
 
-    # [ ] Counter display is not proper becomes 0 for some reason
+    # [ ] Remove Keybinds if Mini SSEdit Window Closed
+    # [X] Counter display is not proper becomes 0 for some reason
     # [X] Deleted Image and Previewing Images is not the same
     def delete_screenshot_function(self):
         global preview_image_index
@@ -167,17 +168,17 @@ class App(ctk.CTk):
 
         if len(self.all_images_fullpath) >= preview_image_index:
             preview_image_index -= 1
-        elif preview_image_index < 0:
+        
+        if preview_image_index <= 0:
             preview_image_index = 0
-        elif preview_image_index == 0:
+        
+        if len(self.all_images_fullpath) == 1:
             preview_image_index = 0
-        # if len(self.all_images_fullpath) <= 1:
-        #     preview_image_index = 0
+
+        self.mini_ss_edit_window.image_preview_canvas.delete('all')
         if len(self.all_images_fullpath) == 0:
-            self.mini_ss_edit_window.image_preview_canvas.delete('all')
             self.mini_ss_edit_window.image_label_content_str.set("No More Screenshots")    
         else:
-            self.mini_ss_edit_window.image_preview_canvas.delete('all')
             self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
             image_counter_str = f'{preview_image_index + 1}/{len(self.all_images_fullpath)}'
             self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
