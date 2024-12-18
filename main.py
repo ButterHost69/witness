@@ -94,14 +94,14 @@ class App(ctk.CTk):
         self.screenshot_counter_window = ScreenshotCounterWindow()
         # print(f"LOG : Screen Shot Counter Set : {self.screenshot_counter_window}")
     
-    # TODO: [ ] Unable to Load Separate Window, atm same start, stop window is overriden
+    # TODO: [X] Unable to Load Separate Window, atm same start, stop window is overriden
     def open_ss_edit_window(self):
         # If Window Already Opened, Close
         if self.if_miniss_edit_window:
             self.mini_ss_edit_window.destroy()
             self.if_miniss_edit_window = False
-            # keyboard.remove_hotkey('ctrl+windows+shift+>')
-            # keyboard.remove_hotkey('ctrl+windows+shift+D')
+            keyboard.remove_hotkey('ctrl+windows+shift+>')
+            keyboard.remove_hotkey('ctrl+windows+shift+:')
             return
 
         # Or Open Window
@@ -210,10 +210,10 @@ class App(ctk.CTk):
         images_sort_list = [int(image.split(".")[0]) for image in image_list]
         images_sort_list.sort()
         # path = str(rf"{path}\{str(image)}.png")
-        print("Pre-add",images_sort_list)
+        # print("Pre-add",images_sort_list)
         # images_sort_list = [os.path.join(path, f"{image}.png") for image in images_sort_list]
         images_sort_list = [f"{path}/{image}.png" for image in images_sort_list]
-        print("Post-add", images_sort_list)
+        # print("Post-add", images_sort_list)
         # images_sort_list = [str(path + r"\\" + str(image) + ".png") for image in images_sort_list]
         return images_sort_list
 
@@ -227,12 +227,14 @@ class App(ctk.CTk):
             self.screenshot_counter_window = None
 
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
-        self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
-
-        self.update_preview_page_stack()
+        if len(self.all_images_fullpath) != 0:
+            self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
+            self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
+            self.update_preview_page_stack()
+        
         self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all, load_all_images_to_clipboardserver_func = self.load_all_images_to_clipboard)
-        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
-    
+        
+
     def change_image(self, button:ctk.CTkButton):
         for cbutton in self.menu_window.image_buttons_list:
             cbutton.configure(bg_color = 'transparent', fg_color='transparent')

@@ -116,25 +116,31 @@ class Menu(ctk.CTkFrame):
     def __init__(self, parent, image_list, change_image_func, confirm_image_size_func, apply_crop_to_all_func, load_all_images_to_clipboardserver_func):
         super().__init__(master = parent)
         self.grid(row = 0, column = 0, sticky = 'nsew')
-        self.change_image_func = change_image_func
-        self.scrollabe_images_frame = ctk.CTkScrollableFrame(master = self)
-        self.image_buttons_list = []
-        for file in image_list:
-            image_name = file.split("/")[-1]
-            button = ctk.CTkButton(master = self.scrollabe_images_frame, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
-            button.configure(command = lambda button = button: change_image_func(button))
-            button.pack(pady=1)
-            self.image_buttons_list.append(button)
-
-        self.scrollabe_images_frame.pack()
-        confirm_ss_btn = ctk.CTkButton(master = self, text = "Confirm Crop", command= confirm_image_size_func)
-        confirm_ss_btn.pack(pady=5)
-
-        apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Apply Crop to All", command= apply_crop_to_all_func)
-        apply_to_all_btn.pack(pady = 10)
+        if len(image_list) == 0:
+            noimages = ctk.CTkLabel(master=self, text="No Images Found")
+            noimages.pack()
         
-        load_images_to_clipboard_btn = ctk.CTkButton(master = self, text = "Load Images to Clipboard", command=load_all_images_to_clipboardserver_func)
-        load_images_to_clipboard_btn.pack(pady = 30)
+        else:
+            self.change_image_func = change_image_func
+            self.scrollabe_images_frame = ctk.CTkScrollableFrame(master = self)
+            self.image_buttons_list = []
+            for file in image_list:
+                image_name = file.split("/")[-1]
+                button = ctk.CTkButton(master = self.scrollabe_images_frame, text = image_name, bg_color = 'transparent', fg_color='transparent', text_color='white')
+                button.configure(command = lambda button = button: change_image_func(button))
+                button.pack(pady=1)
+                self.image_buttons_list.append(button)
+
+        
+            self.scrollabe_images_frame.pack()
+            confirm_ss_btn = ctk.CTkButton(master = self, text = "Confirm Crop", command= confirm_image_size_func)
+            confirm_ss_btn.pack(pady=5)
+
+            apply_to_all_btn = ctk.CTkCheckBox(master = self, text = "Apply Crop to All", command= apply_crop_to_all_func)
+            apply_to_all_btn.pack(pady = 10)
+
+            load_images_to_clipboard_btn = ctk.CTkButton(master = self, text = "Load Images to Clipboard", command=load_all_images_to_clipboardserver_func)
+            load_images_to_clipboard_btn.pack(pady = 30)
 
 class ClipboardWindow(ctk.CTkFrame):
     def __init__(self, parent):
@@ -181,5 +187,5 @@ class MiniSSEditWindow(ctk.CTkToplevel):
         # self.instruction_label = ctk.CTkLabel(master = self, text = "Press <ctrl+windows+shift+'>' To cycle Images")
         self.instruction_label.pack()
         self.delete_label.pack()
-        
+    
 
