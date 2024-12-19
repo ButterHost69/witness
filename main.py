@@ -19,7 +19,7 @@ import shutil
 #TODO: [ ] Continue Taking More Screenshots in SS Edit Window and be displayed
 #TODO: [ ] See a better way of loading Images/Something like lazy loading ?? Have a Global Place to store images, from where they can be accessed by others
 
-# FIXME: [ ] When No Images blank screen appears, fix and display no image or something
+# FIXME: [X] When No Images blank screen appears, fix and display no image or something
 
 class MyImage():
     def __init__(self, filepath:str):
@@ -109,6 +109,7 @@ class App(ctk.CTk):
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
         self.mini_ss_edit_window = MiniSSEditWindow()
         keyboard.add_hotkey('ctrl+windows+shift+>', self.cycle_preview_miniss_images)
+        keyboard.add_hotkey('ctrl+windows+shift+<', self.cycle_preview_miniss_images_back)
         keyboard.add_hotkey('ctrl+windows+shift+:', self.delete_screenshot_confirm)
 
         self.update_preview_page_stack()
@@ -334,6 +335,18 @@ class App(ctk.CTk):
     def cycle_preview_miniss_images(self):
         global preview_image_index
         preview_image_index += 1
+        total_images = len(self.all_images_fullpath)
+        if preview_image_index == total_images:
+            preview_image_index = 0
+
+        self.mini_ss_edit_window.image_preview_canvas.delete('all')
+        self.mini_ss_edit_window.image_preview_canvas.create_image(150, 150, image = self.preview_image_stack[preview_image_index].image_tk)
+        image_counter_str = f'{preview_image_index + 1}/{total_images}'
+        self.mini_ss_edit_window.image_label_content_str.set(image_counter_str)
+
+    def cycle_preview_miniss_images_back(self):
+        global preview_image_index
+        preview_image_index -= 1
         total_images = len(self.all_images_fullpath)
         if preview_image_index == total_images:
             preview_image_index = 0
