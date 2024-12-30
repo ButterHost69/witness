@@ -108,7 +108,7 @@ class ImageCanvas(Canvas):
         self.grid(row=0, column=1, sticky='nsew')
         # self.bind('<Motion>',  lambda event: print(f'Image Cnavas: x1: {event.x} | y1: {event.y}'))
         self.bind('<B1-Motion>', draw_cropbox_func)
-        self.bind('<ButtonRelease-1>', reset_draw_cropbox_func)
+        self.bind('<ButtonRelease-1>', reset_draw_cropbox_func) # IDK What this does
         self.bind('<Configure>', load_image_func)
 
 

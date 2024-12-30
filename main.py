@@ -230,7 +230,9 @@ class App(ctk.CTk):
         self.all_images_fullpath = self.getallimages(self.images_folder_path)
         if len(self.all_images_fullpath) != 0:
             self.curr_image = MyImage(filepath=self.all_images_fullpath[0])
+            # Call New Window and Set Keyboard Binds
             self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
+            keyboard.add_hotkey('escape', self.reset_cropbox_func)
             self.update_preview_page_stack()
         
         self.menu_window = Menu(self, image_list=self.all_images_fullpath, change_image_func = self.change_image, confirm_image_size_func = self.confirm_image_size, apply_crop_to_all_func=self.apply_to_all, load_all_images_to_clipboardserver_func = self.load_all_images_to_clipboard)
@@ -245,7 +247,7 @@ class App(ctk.CTk):
         fullpath = self.images_folder_path + "/" + image_name
         self.image_canvas.delete(self.image_canvas_tagname)
         self.curr_image = MyImage(filepath=fullpath)
-        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)        
+        self.image_canvas = ImageCanvas(self, load_image_func=self.load_image, draw_cropbox_func= self.draw_cropbox, reset_draw_cropbox_func= self.reset_draw_cropbox)
 
     def load_image(self, event):
         self.canvas_ratio = event.width / event.height
@@ -270,6 +272,20 @@ class App(ctk.CTk):
             self.image_canvas.delete(self.cropbox_tagname)
         self.old_box = self.image_canvas.create_rectangle(self.x1, self.y1, event.x, event.y, tags=self.cropbox_tagname, )
 
+    def reset_cropbox_func(self):
+        print("Reset Coordinates")
+        self.x1 = None
+        self.y1 = None
+        self.x2 = None
+        self.y2 = None
+
+        self.newx1 = None
+        self.newy1 = None
+        self.newx2 = None
+        self.newy2 = None
+        self.image_canvas.delete(self.cropbox_tagname)
+
+    # IDK What this does
     def reset_draw_cropbox(self, event):
         # self.x1 = None
         # self.y1 = None
@@ -281,6 +297,8 @@ class App(ctk.CTk):
         self.newy2 = self.y2 - extra_yspace
         self.newx1 = self.x1 - extra_xspace
         self.newx2 = self.x2 - extra_xspace
+        print(f"x1: {self.newx1}  || x2: {self.newx2}")
+        print(f"y1: {self.newy1}  || y2: {self.newy2}")
 
     def confirm_image_size(self):
         # Resized Image Coordinates -> to -> Image Cordinates
